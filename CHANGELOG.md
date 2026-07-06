@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.6.0](https://github.com/ChromeDevTools/chrome-devtools-mcp/compare/chrome-devtools-mcp-v1.5.0...chrome-devtools-mcp-v1.6.0) (2026-07-06)
+
+
+### 🎉 Features
+
+* add experimentalGcfFormat flag for GCF-encoded tool responses ([#2235](https://github.com/ChromeDevTools/chrome-devtools-mcp/issues/2235)) ([3d21389](https://github.com/ChromeDevTools/chrome-devtools-mcp/commit/3d2138945c7d3ee95f95c36680ce7c63d24f672f))
+
+
+### 🛠️ Fixes
+
+* enforce .gz instead of json.gz in performance tools ([#2305](https://github.com/ChromeDevTools/chrome-devtools-mcp/issues/2305)) ([b06e39b](https://github.com/ChromeDevTools/chrome-devtools-mcp/commit/b06e39b164f02a30efc58057091436a1329949bd))
+* **snapshot:** resolve element ids on the correct snapshot ([#2295](https://github.com/ChromeDevTools/chrome-devtools-mcp/issues/2295)) ([b703f2c](https://github.com/ChromeDevTools/chrome-devtools-mcp/commit/b703f2ce20bbe2ce8af4f0a77e56a6a3e1b9c6d6))
+
+
+### 📄 Documentation
+
+* add Grok Build CLI configuration section ([#2294](https://github.com/ChromeDevTools/chrome-devtools-mcp/issues/2294)) ([aa4be07](https://github.com/ChromeDevTools/chrome-devtools-mcp/commit/aa4be07f7ab09430a601460c3f6cec5deb4c7263))
+
+
+### ⚡ Performance
+
+* concurrent I/O in Root Path Resolution ([#2279](https://github.com/ChromeDevTools/chrome-devtools-mcp/issues/2279)) ([b2c63e6](https://github.com/ChromeDevTools/chrome-devtools-mcp/commit/b2c63e644eae3fad6747c1f3d678952fc4d756c0))
+
 ## [1.5.0](https://github.com/ChromeDevTools/chrome-devtools-mcp/compare/chrome-devtools-mcp-v1.4.0...chrome-devtools-mcp-v1.5.0) (2026-07-03)
 
 
