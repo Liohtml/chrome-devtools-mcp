@@ -5,6 +5,7 @@
  */
 
 import {toCurl, toFetch} from '../formatters/CurlFormatter.js';
+import {toHar} from '../formatters/HarFormatter.js';
 import {zod} from '../third_party/index.js';
 import type {ResourceType} from '../third_party/index.js';
 
@@ -160,7 +161,6 @@ export const toSnippet = definePageTool({
       ),
     format: zod
       .enum(['curl', 'fetch'])
-      .default('curl')
       .optional()
       .describe('Output format. Defaults to curl.'),
     includeSensitiveHeaders: zod
@@ -203,5 +203,74 @@ export const toSnippet = definePageTool({
     response.appendResponseLine(format === 'fetch' ? '```js' : '```sh');
     response.appendResponseLine(snippet);
     response.appendResponseLine('```');
+  },
+});
+
+export const exportHar = definePageTool({
+  name: 'export_har',
+  description: `Export the captured network requests for the selected page to a HAR (HTTP Archive) file on disk. Sensitive headers are redacted by default; response bodies are omitted unless includeResponseBodies is set.`,
+  annotations: {
+    category: ToolCategory.NETWORK,
+    readOnlyHint: false,
+  },
+  schema: {
+    filePath: zod
+      .string()
+      .describe(
+        'The absolute or relative path to write the HAR file to. A .har extension is enforced.',
+      ),
+    resourceTypes: zod
+      .array(zod.enum(FILTERABLE_RESOURCE_TYPES))
+      .optional()
+      .describe(
+        'Only include requests of these resource types. When omitted, includes all.',
+      ),
+    includePreservedRequests: zod
+      .boolean()
+      .default(false)
+      .optional()
+      .describe('Include the preserved requests over the last 3 navigations.'),
+    includeResponseBodies: zod
+      .boolean()
+      .default(false)
+      .optional()
+      .describe(
+        'Include response bodies in the HAR (produces a larger file). Defaults to false.',
+      ),
+    includeSensitiveHeaders: zod
+      .boolean()
+      .default(false)
+      .optional()
+      .describe(
+        'Include sensitive headers (authorization, cookie, ...) verbatim. Defaults to false (redacted).',
+      ),
+  },
+  blockedByDialog: true,
+  verifyFilesSchema: ['filePath'],
+  handler: async (request, response, context) => {
+    const all = context.getNetworkRequests(
+      request.page,
+      request.params.includePreservedRequests,
+    );
+    const resourceTypes = request.params.resourceTypes;
+    let requests = all;
+    if (resourceTypes && resourceTypes.length) {
+      const wanted = new Set<string>(resourceTypes);
+      requests = all.filter(item => wanted.has(item.resourceType()));
+    }
+
+    const har = await toHar(requests, {
+      includeSensitiveHeaders: request.params.includeSensitiveHeaders ?? false,
+      includeResponseBodies: request.params.includeResponseBodies ?? false,
+    });
+    const bytes = Buffer.from(JSON.stringify(har, null, 2), 'utf-8');
+    const {filename} = await context.saveFile(
+      bytes,
+      request.params.filePath,
+      '.har',
+    );
+    response.appendResponseLine(
+      `Exported ${requests.length} network request(s) to ${filename}.`,
+    );
   },
 });

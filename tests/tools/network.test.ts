@@ -5,9 +5,14 @@
  */
 
 import assert from 'node:assert';
+import {randomUUID} from 'node:crypto';
+import {readFile, rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {describe, it} from 'node:test';
 
 import {
+  exportHar,
   getNetworkRequest,
   listNetworkRequests,
   toSnippet,
@@ -269,6 +274,65 @@ describe('network', () => {
           );
           assert.match(shown, /Bearer secret-token/);
         });
+      });
+    });
+  });
+  describe('network_export_har', () => {
+    it('exports captured requests to a valid HAR file and redacts by default', async () => {
+      server.addHtmlRoute('/one', html`<main>First</main>`);
+      await withMcpContext(async (response, context) => {
+        await context.setUpNetworkCollectorForTesting();
+        const page = context.getSelectedPptrPage();
+        await page.setExtraHTTPHeaders({authorization: 'Bearer secret-token'});
+        await page.goto(server.getRoute('/one'));
+
+        const filePath = join(tmpdir(), `export-${randomUUID()}.har`);
+        try {
+          await exportHar.handler(
+            {params: {filePath}, page: context.getSelectedMcpPage()},
+            response,
+            context,
+          );
+          const text = getTextContent(
+            (await response.handle('export_har', context)).content[0],
+          );
+          assert.match(text, /Exported \d+ network request/);
+
+          const raw = await readFile(filePath, 'utf-8');
+          assert.doesNotThrow(() => JSON.parse(raw));
+          assert.match(raw, /"version": "1\.2"/);
+          assert.match(raw, /"method": "GET"/);
+          assert.match(raw, /\/one/);
+          assert.doesNotMatch(raw, /secret-token/);
+        } finally {
+          await rm(filePath, {force: true});
+        }
+      });
+    });
+
+    it('includes response bodies when requested', async () => {
+      server.addHtmlRoute('/one', html`<main>First</main>`);
+      await withMcpContext(async (response, context) => {
+        await context.setUpNetworkCollectorForTesting();
+        const page = context.getSelectedPptrPage();
+        await page.goto(server.getRoute('/one'));
+
+        const filePath = join(tmpdir(), `export-${randomUUID()}.har`);
+        try {
+          await exportHar.handler(
+            {
+              params: {filePath, includeResponseBodies: true},
+              page: context.getSelectedMcpPage(),
+            },
+            response,
+            context,
+          );
+          await response.handle('export_har', context);
+          const raw = await readFile(filePath, 'utf-8');
+          assert.match(raw, /First/);
+        } finally {
+          await rm(filePath, {force: true});
+        }
       });
     });
   });

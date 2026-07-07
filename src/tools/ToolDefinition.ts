@@ -183,6 +183,7 @@ export type SupportedExtensions =
   | '.json'
   | '.network-response'
   | '.network-request'
+  | '.har'
   | '.html'
   | '.txt'
   | '.csv'

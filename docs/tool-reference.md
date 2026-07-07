@@ -27,9 +27,11 @@
   - [`performance_analyze_insight`](#performance_analyze_insight)
   - [`performance_start_trace`](#performance_start_trace)
   - [`performance_stop_trace`](#performance_stop_trace)
-- **[Network](#network)** (2 tools)
+- **[Network](#network)** (4 tools)
+  - [`export_har`](#export_har)
   - [`get_network_request`](#get_network_request)
   - [`list_network_requests`](#list_network_requests)
+  - [`to_snippet`](#to_snippet)
 - **[Debugging](#debugging)** (8 tools)
   - [`evaluate_script`](#evaluate_script)
   - [`get_console_message`](#get_console_message)
@@ -318,6 +320,20 @@
 
 ## Network
 
+### `export_har`
+
+**Description:** Export the captured network requests for the selected page to a HAR (HTTP Archive) file on disk. Sensitive headers are redacted by default; response bodies are omitted unless includeResponseBodies is set.
+
+**Parameters:**
+
+- **filePath** (string) **(required)**: The absolute or relative path to write the HAR file to. A .har extension is enforced.
+- **includePreservedRequests** (boolean) _(optional)_: Include the preserved requests over the last 3 navigations.
+- **includeResponseBodies** (boolean) _(optional)_: Include response bodies in the HAR (produces a larger file). Defaults to false.
+- **includeSensitiveHeaders** (boolean) _(optional)_: Include sensitive headers (authorization, cookie, ...) verbatim. Defaults to false (redacted).
+- **resourceTypes** (array) _(optional)_: Only include requests of these resource types. When omitted, includes all.
+
+---
+
 ### `get_network_request`
 
 **Description:** Gets a network request by an optional reqid, if omitted returns the currently selected request in the DevTools Network panel.
@@ -340,6 +356,18 @@
 - **pageIdx** (integer) _(optional)_: Page number to return (0-based). When omitted, returns the first page.
 - **pageSize** (integer) _(optional)_: Maximum number of requests to return. When omitted, returns all requests.
 - **resourceTypes** (array) _(optional)_: Filter requests to only return requests of the specified resource types. When omitted or empty, returns all requests.
+
+---
+
+### `to_snippet`
+
+**Description:** Generate a runnable curl or fetch code snippet that reproduces a captured network request. Sensitive headers (authorization, cookie, ...) are redacted by default; set includeSensitiveHeaders to true to reproduce authenticated requests.
+
+**Parameters:**
+
+- **format** (enum: "curl", "fetch") _(optional)_: Output format. Defaults to curl.
+- **includeSensitiveHeaders** (boolean) _(optional)_: Include sensitive headers (authorization, cookie, ...) verbatim so the snippet works for authenticated endpoints. Defaults to false (redacted).
+- **reqid** (number) _(optional)_: The reqid of the network request (see [`list_network_requests`](#list_network_requests)). If omitted, uses the request currently selected in the DevTools Network panel.
 
 ---
 

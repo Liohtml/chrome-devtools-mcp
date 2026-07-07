@@ -876,5 +876,43 @@
         "argType": "number"
       }
     ]
+  },
+  {
+    "name": "export_har",
+    "args": [
+      {
+        "name": "file_path_length",
+        "argType": "number"
+      },
+      {
+        "name": "resource_types_count",
+        "argType": "number"
+      },
+      {
+        "name": "include_preserved_requests",
+        "argType": "boolean"
+      },
+      {
+        "name": "include_response_bodies",
+        "argType": "boolean"
+      },
+      {
+        "name": "include_sensitive_headers",
+        "argType": "boolean"
+      }
+    ]
+  },
+  {
+    "name": "to_snippet",
+    "args": [
+      {
+        "name": "format",
+        "argType": "string"
+      },
+      {
+        "name": "include_sensitive_headers",
+        "argType": "boolean"
+      }
+    ]
   }
 ]

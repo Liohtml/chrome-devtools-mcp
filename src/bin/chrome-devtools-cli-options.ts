@@ -290,6 +290,51 @@ export const commands: Commands = {
       },
     },
   },
+  export_har: {
+    description:
+      'Export the captured network requests for the selected page to a HAR (HTTP Archive) file on disk. Sensitive headers are redacted by default; response bodies are omitted unless includeResponseBodies is set.',
+    category: 'Network',
+    args: {
+      filePath: {
+        name: 'filePath',
+        type: 'string',
+        description:
+          'The absolute or relative path to write the HAR file to. A .har extension is enforced.',
+        required: true,
+      },
+      resourceTypes: {
+        name: 'resourceTypes',
+        type: 'array',
+        description:
+          'Only include requests of these resource types. When omitted, includes all.',
+        required: false,
+      },
+      includePreservedRequests: {
+        name: 'includePreservedRequests',
+        type: 'boolean',
+        description:
+          'Include the preserved requests over the last 3 navigations.',
+        required: false,
+        default: false,
+      },
+      includeResponseBodies: {
+        name: 'includeResponseBodies',
+        type: 'boolean',
+        description:
+          'Include response bodies in the HAR (produces a larger file). Defaults to false.',
+        required: false,
+        default: false,
+      },
+      includeSensitiveHeaders: {
+        name: 'includeSensitiveHeaders',
+        type: 'boolean',
+        description:
+          'Include sensitive headers (authorization, cookie, ...) verbatim. Defaults to false (redacted).',
+        required: false,
+        default: false,
+      },
+    },
+  },
   fill: {
     description:
       'Type text into an input, text area or select an option from a <select> element.',
@@ -1072,6 +1117,35 @@ export const commands: Commands = {
         description:
           'The absolute path, or a path relative to the current working directory, to save the snapshot to instead of attaching it to the response.',
         required: false,
+      },
+    },
+  },
+  to_snippet: {
+    description:
+      'Generate a runnable curl or fetch code snippet that reproduces a captured network request. Sensitive headers (authorization, cookie, ...) are redacted by default; set includeSensitiveHeaders to true to reproduce authenticated requests.',
+    category: 'Network',
+    args: {
+      reqid: {
+        name: 'reqid',
+        type: 'number',
+        description:
+          'The reqid of the network request (see list_network_requests). If omitted, uses the request currently selected in the DevTools Network panel.',
+        required: false,
+      },
+      format: {
+        name: 'format',
+        type: 'string',
+        description: 'Output format. Defaults to curl.',
+        required: false,
+        enum: ['curl', 'fetch'],
+      },
+      includeSensitiveHeaders: {
+        name: 'includeSensitiveHeaders',
+        type: 'boolean',
+        description:
+          'Include sensitive headers (authorization, cookie, ...) verbatim so the snippet works for authenticated endpoints. Defaults to false (redacted).',
+        required: false,
+        default: false,
       },
     },
   },
